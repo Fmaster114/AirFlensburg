@@ -3,36 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Flensburg Cargo | North America Route Map & Fleet</title>
+    <title>Air Flensburg Cargo | North American Logistics Hub</title>
+    <!-- Leaflet CSS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         :root {
             --primary-blue: #0b2545;
+            --secondary-blue: #133863;
             --accent-yellow: #f4d03f;
-            --light-bg: #f8f9fa;
-            --text-dark: #333333;
+            --light-bg: #f4f6f9;
+            --text-dark: #2c3e50;
+            --white: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
             background-color: var(--light-bg);
             color: var(--text-dark);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* Top Bar */
+        .top-bar {
+            background-color: #07172b;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            padding: 0.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar span {
+            color: var(--accent-yellow);
+            font-weight: 600;
+        }
+
+        /* Header & Navigation */
         header {
             background-color: var(--primary-blue);
-            color: white;
-            padding: 1.5rem 2rem;
+            color: var(--white);
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 4px solid var(--accent-yellow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .logo-area {
@@ -41,369 +68,719 @@
             gap: 1rem;
         }
 
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: white;
+        .logo-badge {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 900;
             color: var(--primary-blue);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border: 2px solid var(--accent-yellow);
+            box-shadow: 0 0 10px rgba(244, 208, 63, 0.4);
+            animation: pulse-logo 3s infinite;
         }
 
-        h1 {
-            font-size: 1.5rem;
-            letter-spacing: 1px;
+        @keyframes pulse-logo {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 208, 63, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(244, 208, 63, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 208, 63, 0); }
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--accent-yellow);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
         }
 
         nav a {
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            margin-left: 2rem;
             font-weight: 600;
-            transition: color 0.3s;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-yellow);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 80%;
         }
 
         nav a:hover {
             color: var(--accent-yellow);
         }
 
+        /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
-            color: white;
+            background: linear-gradient(135deg, rgba(11, 37, 69, 0.92), rgba(19, 56, 99, 0.85)), url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: var(--white);
+            padding: 7rem 5% 5rem 5%;
             text-align: center;
-            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInDown 1s ease-out;
         }
 
         .hero h2 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
+            color: var(--white);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .hero h2 span {
             color: var(--accent-yellow);
         }
 
         .hero p {
             font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem auto;
+            margin-bottom: 2.5rem;
+            color: #cbd5e1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
         }
 
         .btn {
             background-color: var(--accent-yellow);
             color: var(--primary-blue);
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 2rem;
             border: none;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            border-radius: 4px;
-            transition: transform 0.2s, background-color 0.2s;
+            border-radius: 6px;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(244, 208, 63, 0.3);
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-3px);
             background-color: #f1c40f;
+            box-shadow: 0 6px 20px rgba(244, 208, 63, 0.5);
         }
 
+        .btn-outline {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--white);
+            color: var(--primary-blue);
+        }
+
+        /* Main Container & Tabs System */
         .container {
-            max-width: 1100px;
-            margin: 3rem auto;
-            padding: 0 1.5rem;
+            max-width: 1200px;
+            margin: -3rem auto 4rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
         }
 
-        section {
-            margin-bottom: 4rem;
+        .tab-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
 
-        h3 {
+        .tab-header {
+            display: flex;
+            background: #e2e8f0;
+            border-bottom: 1px solid #cbd5e1;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-blue);
+            background: rgba(255,255,255,0.5);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            background: var(--white);
+            border-bottom: 4px solid var(--accent-yellow);
+        }
+
+        .tab-body {
+            padding: 3rem;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Section Headings */
+        .section-title {
             font-size: 2rem;
             color: var(--primary-blue);
-            margin-bottom: 1.5rem;
-            text-align: center;
-            position: relative;
-        }
-
-        h3::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background-color: var(--accent-yellow);
-            margin: 0.5rem auto 0 auto;
-        }
-
-        .destinations-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-            border-top: 4px solid var(--primary-blue);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h4 {
-            color: var(--primary-blue);
             margin-bottom: 0.5rem;
+            font-weight: 800;
         }
 
-        .card span {
-            font-size: 0.9rem;
-            color: #666;
-            background: #eee;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
+        .section-subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
         }
 
-        .fleet-container {
-            background: white;
-            padding: 2rem;
+        /* Interactive Map Section */
+        .map-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        #routeMap {
+            height: 500px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 2px solid #e2e8f0;
+        }
+
+        .hub-card {
+            background: var(--light-bg);
+            border-left: 5px solid var(--primary-blue);
+            padding: 1.5rem;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .destination-list {
+            max-height: 380px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .dest-item {
+            background: var(--white);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .dest-item:hover {
+            border-color: var(--accent-yellow);
+            transform: translateX(4px);
+        }
+
+        .dest-code {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Fleet Section & Specs */
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .fleet-info h3 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
         }
 
         .specs-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
             margin-top: 2rem;
         }
 
-        .spec-item {
+        .spec-box {
             background: var(--light-bg);
-            padding: 1rem;
-            border-radius: 6px;
-            text-align: center;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-top: 3px solid var(--accent-yellow);
+            transition: var(--transition);
         }
 
-        .spec-item label {
+        .spec-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+        }
+
+        .spec-box label {
             display: block;
-            font-size: 0.85rem;
-            color: #666;
+            font-size: 0.75rem;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 700;
             margin-bottom: 0.3rem;
         }
 
-        .spec-item value {
-            font-size: 1.25rem;
-            font-weight: bold;
+        .spec-box span {
+            font-size: 1.4rem;
+            font-weight: 800;
             color: var(--primary-blue);
         }
 
-        /* Modal / Interactive Element */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
+        .plane-visual {
+            background: linear-gradient(135deg, #0b2545, #133863);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
         }
 
-        .modal-content {
-            background: white;
+        .plane-visual h4 {
+            color: var(--accent-yellow);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Schedule & Tracking Tab */
+        .tracker-wrapper {
+            background: var(--light-bg);
             padding: 2rem;
             border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
+            max-width: 600px;
+            margin: 0 auto;
             text-align: center;
         }
 
-        .modal-content input {
-            width: 100%;
-            padding: 0.75rem;
-            margin: 1rem 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
         }
 
+        .input-group input {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 37, 69, 0.1);
+        }
+
+        #trackerResult {
+            margin-top: 1.5rem;
+            text-align: left;
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
         footer {
             background-color: var(--primary-blue);
-            color: white;
+            color: var(--white);
             text-align: center;
-            padding: 2rem;
+            padding: 3rem 2rem;
             border-top: 4px solid var(--accent-yellow);
-            font-size: 0.9rem;
         }
 
-        @media(max-width: 768px) {
-            .specs-grid {
+        footer p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive */
+        @media(max-width: 900px) {
+            .map-layout, .fleet-grid {
                 grid-template-columns: 1fr;
             }
-            nav {
-                display: none;
+            #routeMap {
+                height: 350px;
+            }
+            .hero h2 {
+                font-size: 2.2rem;
             }
         }
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <div>Operations Dispatch: <span>+1 (800) 555-FLEN</span> | Winnipeg Hub Control Active</div>
+        <div>Secure Cargo Portal v4.2</div>
+    </div>
+
     <header>
         <div class="logo-area">
-            <div class="logo-icon">AF</div>
-            <h1>AIR FLENSBURG CARGO</h1>
+            <div class="logo-badge">AF</div>
+            <div class="logo-text">
+                <h1>AIR FLENSBURG CARGO</h1>
+                <p>North American Air Logistics</p>
+            </div>
         </div>
         <nav>
-            <a href="#destinations">Routes</a>
-            <a href="#fleet">Fleet</a>
-            <a href="#contact" onclick="openModal(event)">Book Cargo</a>
+            <a href="#" onclick="switchTab(0); return false;" class="nav-link active">Home</a>
+            <a href="#" onclick="switchTab(1); return false;" class="nav-link">Route Map</a>
+            <a href="#" onclick="switchTab(2); return false;" class="nav-link">Fleet & Livery</a>
+            <a href="#" onclick="switchTab(3); return false;" class="nav-link">Cargo Tracking</a>
         </nav>
     </header>
 
     <div class="hero">
-        <h2>Connecting North America from Winnipeg</h2>
-        <p>Reliable regional cargo transport with guaranteed return flights and precise logistics solutions.</p>
-        <button class="btn" onclick="openModal()">Inquire For Freight</button>
+        <div class="hero-content">
+            <h2>Precision Freight Connecting <span>North America</span></h2>
+            <p>Operating out of our central Winnipeg hub with guaranteed return scheduling and high-payload regional connectivity.</p>
+            <div class="btn-group">
+                <a href="#" class="btn" onclick="switchTab(1)">Explore Route Map</a>
+                <a href="#" class="btn btn-outline" onclick="switchTab(3)">Track Shipment</a>
+            </div>
+        </div>
     </div>
 
     <div class="container">
-        
-        <!-- Destinations Section -->
-        <section id="destinations">
-            <h3>Our Hub & Destinations</h3>
-            <p style="text-align: center; margin-bottom: 2rem; color: #555;">Primary Hub: <strong>Winnipeg (CYWG)</strong> — All routes feature return flights.</p>
-            
-            <div class="destinations-grid">
-                <div class="card">
-                    <h4>Edmonton</h4>
-                    <span>CYEG</span>
-                </div>
-                <div class="card">
-                    <h4>Calgary</h4>
-                    <span>CYYC</span>
-                </div>
-                <div class="card">
-                    <h4>Vancouver</h4>
-                    <span>CYVR</span>
-                </div>
-                <div class="card">
-                    <h4>Regina</h4>
-                    <span>CYQR</span>
-                </div>
-                <div class="card">
-                    <h4>Saskatoon</h4>
-                    <span>CYXE</span>
-                </div>
-                <div class="card">
-                    <h4>Thunder Bay</h4>
-                    <span>CYQT</span>
-                </div>
-                <div class="card">
-                    <h4>Montréal</h4>
-                    <span>CYUL</span>
-                </div>
-                <div class="card">
-                    <h4>Toronto</h4>
-                    <span>CYYZ</span>
-                </div>
-                <div class="card">
-                    <h4>Minneapolis</h4>
-                    <span>KMSP</span>
-                </div>
-                <div class="card">
-                    <h4>Chicago</h4>
-                    <span>KORD</span>
-                </div>
+        <div class="tab-card">
+            <!-- Tab Navigation Header -->
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab(0)">Overview</button>
+                <button class="tab-btn" onclick="switchTab(1)">Interactive Map & Destinations</button>
+                <button class="tab-btn" onclick="switchTab(2)">Fleet Specifications</button>
+                <button class="tab-btn" onclick="switchTab(3)">Shipment Tracker</button>
             </div>
-        </section>
 
-        <!-- Fleet Section -->
-        <section id="fleet">
-            <h3>Our Fleet & Livery</h3>
-            <div class="fleet-container">
-                <div style="text-align: center;">
-                    <h4 style="color: var(--primary-blue); font-size: 1.5rem;">BAE 146F × 2</h4>
-                    <p style="color: #666;">Blue and yellow livery engineered for heavy regional payload capacity.</p>
-                </div>
+            <!-- Tab Body Contents -->
+            <div class="tab-body">
                 
-                <div class="specs-grid">
-                    <div class="spec-item">
-                        <label>Length</label>
-                        <value>30.99 M</value>
-                    </div>
-                    <div class="spec-item">
-                        <label>Wingspan</label>
-                        <value>26.34 M</value>
-                    </div>
-                    <div class="spec-item">
-                        <label>Height</label>
-                        <value>8.59 M</value>
-                    </div>
-                    <div class="spec-item">
-                        <label>Cruise Speed</label>
-                        <value>750 KM/H</value>
-                    </div>
-                    <div class="spec-item">
-                        <label>Max Altitude</label>
-                        <value>31,000 FT</value>
-                    </div>
-                    <div class="spec-item">
-                        <label>Cargo Payload</label>
-                        <value>10.5 T</value>
+                <!-- Tab 0: Overview -->
+                <div class="tab-pane active" id="pane-0">
+                    <h3 class="section-title">Welcome to Air Flensburg Cargo</h3>
+                    <p class="section-subtitle">Your dependable partner for scheduled cargo routing across Canada and the United States.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                        <div style="background: var(--light-bg); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-blue);">
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Central Hub Connectivity</h4>
+                            <p style="font-size: 0.95rem; color: #555;">Anchored at Winnipeg International (CYWG), our star-pattern routing ensures fast transit times between major western, eastern, and midwestern commercial centers.</p>
+                        </div>
+                        <div style="background: var(--light-bg); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--accent-yellow);">
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Guaranteed Return Flights</h4>
+                            <p style="font-size: 0.95rem; color: #555;">All outbound regional legs feature immediate backhaul capability, maintaining seamless bi-directional supply chains for industrial freight.</p>
+                        </div>
+                        <div style="background: var(--light-bg); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-blue);">
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Specialized Fleet</h4>
+                            <p style="font-size: 0.95rem; color: #555;">Utilizing our specialized BAE 146F aircraft fleet optimized for tight turnaround times and heavy high-density regional payloads.</p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Tab 1: Route Map & Destinations -->
+                <div class="tab-pane" id="pane-1">
+                    <h3 class="section-title">North America Route Map</h3>
+                    <p class="section-subtitle">Click destinations below or interact directly with the hub map to inspect routes.</p>
+                    
+                    <div class="map-layout">
+                        <div id="routeMap"></div>
+                        <div class="hub-card">
+                            <div>
+                                <h4 style="color: var(--primary-blue); font-size: 1.2rem;">Primary Hub</h4>
+                                <p style="font-weight: 700; font-size: 1.1rem; margin-top: 0.2rem;">Winnipeg (CYWG)</p>
+                                <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">All routes operate dual-direction return schedules daily.</p>
+                                
+                                <div class="destination-list" id="destListContainer">
+                                    <!-- Injected via JS -->
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.8rem; text-align: center; color: #64748b;">
+                                Total Active Destinations: 10 Cities
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Fleet Specifications -->
+                <div class="tab-pane" id="pane-2">
+                    <h3 class="section-title">Aircraft & Livery Specifications</h3>
+                    <p class="section-subtitle">Engineered for performance across varying regional runways and weather conditions.</p>
+                    
+                    <div class="fleet-grid">
+                        <div class="fleet-info">
+                            <h3>BAE 146F Cargo Configuration</h3>
+                            <p style="color: #64748b; margin-bottom: 1.5rem;">Sporting our iconic royal blue and yellow nose livery, our twin aircraft deliver exceptional short-field performance coupled with robust container handling capability.</p>
+                            <div class="specs-grid">
+                                <div class="spec-box">
+                                    <label>Length</label>
+                                    <span>30.99 M</span>
+                                </div>
+                                <div class="spec-box">
+                                    <label>Wingspan</label>
+                                    <span>26.34 M</span>
+                                </div>
+                                <div class="spec-box">
+                                    <label>Height</label>
+                                    <span>8.59 M</span>
+                                </div>
+                                <div class="spec-box">
+                                    <label>Cruise Speed</label>
+                                    <span>750 KM/H</span>
+                                </div>
+                                <div class="spec-box">
+                                    <label>Max Altitude</label>
+                                    <span>31,000 FT</span>
+                                </div>
+                                <div class="spec-box">
+                                    <label>Cargo Payload</label>
+                                    <span>10.5 T</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="plane-visual">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">✈️</div>
+                            <h4>AIR FLENSBURG FLEET</h4>
+                            <p style="font-size: 0.95rem; color: #cbd5e1; margin-top: 0.5rem;">Active Fleet Count: <strong>2 Aircraft</strong></p>
+                            <p style="font-size: 0.85rem; color: var(--accent-yellow); margin-top: 1rem;">Rigorous maintenance compliance verified daily at CYWG base.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Shipment Tracker -->
+                <div class="tab-pane" id="pane-3">
+                    <h3 class="section-title">Live Cargo Tracking</h3>
+                    <p class="section-subtitle">Monitor your freight movement instantly across our network nodes.</p>
+                    
+                    <div class="tracker-wrapper">
+                        <p style="font-size: 0.95rem; color: #475569;">Enter your Waybill or Tracking ID (e.g., <em>AFC-CYWG-882</em>):</p>
+                        <div class="input-group">
+                            <input type="text" id="trackingInput" placeholder="Enter Waybill Number...">
+                            <button class="btn" onclick="trackShipment()">Search</button>
+                        </div>
+                        
+                        <div id="trackerResult" style="background: var(--white); padding: 1.5rem; border-radius: 6px; border: 1px solid #cbd5e1;">
+                            <!-- Output injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </section>
-
-    </div>
-
-    <!-- Booking Modal -->
-    <div class="modal" id="bookingModal">
-        <div class="modal-content">
-            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Cargo Space Inquiry</h3>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Enter your tracking or shipment details to connect with Winnipeg Operations.</p>
-            <input type="text" id="shipperName" placeholder="Company Name">
-            <input type="text" placeholder="Origin / Destination Code (e.g., CYWG to CYVR)">
-            <button class="btn" style="width: 100%;" onclick="submitInquiry()">Submit Request</button>
-            <p style="margin-top: 1rem; font-size: 0.8rem; color: #999; cursor: pointer;" onclick="closeModal()">Cancel</p>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 Air Flensburg Cargo. All rights reserved. Operating out of Winnipeg (CYWG).</p>
+        <p><strong>AIR FLENSBURG CARGO</strong> — Headquartered at Winnipeg International Airport (CYWG).</p>
+        <p>&copy; 2026 Air Flensburg Cargo Inc. All rights reserved. Built for secure logistics management.</p>
     </footer>
 
+    <!-- Leaflet JS for Interactive Map Scripting -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
-        const modal = document.getElementById('bookingModal');
+        // Tab switching logic
+        function switchTab(index) {
+            const panes = document.querySelectorAll('.tab-pane');
+            const buttons = document.querySelectorAll('.tab-btn');
+            const navLinks = document.querySelectorAll('.nav-link');
 
-        function openModal(e) {
-            if(e) e.preventDefault();
-            modal.style.display = 'flex';
-        }
+            panes.forEach((pane, i) => {
+                pane.classList.toggle('active', i === index);
+            });
 
-        function closeModal() {
-            modal.style.display = 'none';
-        }
+            buttons.forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
 
-        function submitInquiry() {
-            const name = document.getElementById('shipperName').value;
-            if(name) {
-                alert(`Thank you, ${name}! Your freight request has been sent to Air Flensburg Cargo dispatch.`);
-                closeModal();
-            } else {
-                alert('Please enter your company name.');
+            navLinks.forEach((link, i) => {
+                link.classList.toggle('active', i === index);
+            });
+
+            // Refresh map size if switching to map tab
+            if(index === 1 && window.mapInstance) {
+                setTimeout(() => {
+                    window.mapInstance.invalidateSize();
+                }, 200);
             }
         }
 
-        // Close modal when clicking outside of content
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
+        // Destinations Data with Coordinates
+        const hub = { name: "Winnipeg", code: "CYWG", coords: [49.9100, -97.2399] };
+        const destinations = [
+            { name: "Edmonton", code: "CYEG", coords: [53.3097, -113.5798] },
+            { name: "Calgary", code: "CYYC", coords: [51.1139, -14.0207], realCoords: [51.1139, -114.0207] },
+            { name: "Vancouver", code: "CYVR", coords: [49.1967, -123.1815] },
+            { name: "Regina", code: "CYQR", coords: [50.4319, -104.6656] },
+            { name: "Saskatoon", code: "CYXE", coords: [52.1708, -106.6998] },
+            { name: "Thunder Bay", code: "CYQT", coords: [48.3722, -89.3244] },
+            { name: "Montréal", code: "CYUL", coords: [45.4706, -73.7408] },
+            { name: "Toronto", code: "CYYZ", coords: [43.6777, -79.6248] },
+            { name: "Minneapolis", code: "KMSP", coords: [44.8848, -93.2223] },
+            { name: "Chicago", code: "KORD", coords: [41.9742, -87.9073] }
+        ];
+
+        // Populate Destination list sidebar
+        const listContainer = document.getElementById('destListContainer');
+        destinations.forEach(dest => {
+            const div = document.createElement('div');
+            div.className = 'dest-item';
+            div.innerHTML = `<span><strong>${dest.name}</strong></span> <span class="dest-code">${dest.code}</span>`;
+            div.onclick = () => {
+                if(window.mapInstance) {
+                    const targetCoords = dest.realCoords || dest.coords;
+                    window.mapInstance.setView(targetCoords, 6);
+                }
+            };
+            listContainer.appendChild(div);
+        });
+
+        // Initialize Map after DOM load
+        document.addEventListener("DOMContentLoaded", function() {
+            const map = L.map('routeMap').setView([51.5, -95.0], 4);
+            window.mapInstance = map;
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors & CARTO',
+                maxZoom: 10,
+                minZoom: 3
+            }).addTo(map);
+
+            // Hub Marker
+            const hubIcon = L.divIcon({
+                className: 'custom-hub',
+                html: '<div style="background:#0b2545; color:#f4d03f; border:2px solid #fff; padding:6px; border-radius:50%; font-weight:bold; text-align:center; width:32px; height:32px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 6px rgba(0,0,0,0.3);">HQ</div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            L.marker(hub.coords, {icon: hubIcon}).addTo(map)
+                .bindPopup(`<b>Primary Hub: Winnipeg</b><br>Code: CYWG<br>Central Operations Base`);
+
+            // Destination markers and polylines back to hub
+            destinations.forEach(dest => {
+                const coords = dest.realCoords || dest.coords;
+                
+                const destIcon = L.divIcon({
+                    className: 'custom-dest',
+                    html: '<div style="background:#f4d03f; color:#0b2545; border:2px solid #0b2545; border-radius:50%; width:14px; height:14px; box-shadow:0 2px 4px rgba(0,0,0,0.2);"></div>',
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+
+                L.marker(coords, {icon: destIcon}).addTo(map)
+                    .bindPopup(`<b>${dest.name}</b><br>Airport Code: ${dest.code}<br>Status: Daily Return Route Active`);
+
+                // Draw connecting route line
+                L.polyline([hub.coords, coords], {
+                    color: '#0b2545',
+                    weight: 2,
+                    opacity: 0.5,
+                    dashArray: '4, 8'
+                }).addTo(map);
+            });
+        });
+
+        // Tracker simulation function
+        function trackShipment() {
+            const inputVal = document.getElementById('trackingInput').value.trim();
+            const resultBox = document.getElementById('trackerResult');
+            
+            if(!inputVal) {
+                alert("Please enter a valid tracking or waybill ID.");
+                return;
             }
+
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem; margin-bottom:0.75rem;">
+                    <div><strong>Waybill:</strong> ${inputVal.toUpperCase()}</div>
+                    <span style="background:#dcfce7; color:#166534; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:700;">IN TRANSIT</span>
+                </div>
+                <p style="font-size:0.9rem; color:#475569; margin-bottom:0.5rem;"><strong>Origin:</strong> Winnipeg Hub (CYWG)</p>
+                <p style="font-size:0.9rem; color:#475569; margin-bottom:0.5rem;"><strong>Aircraft Assigned:</strong> BAE 146F (Fleet Unit #1)</p>
+                <p style="font-size:0.9rem; color:#475569;"><strong>Latest Milestone:</strong> Scheduled return leg confirmed on time. Estimated final clearance in 2 hours.</p>
+            `;
         }
     </script>
 </body>
